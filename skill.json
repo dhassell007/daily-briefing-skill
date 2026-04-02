@@ -34,6 +34,6 @@
   "scripts": {
     "main": "scripts/fetch-briefing.py"
   },
-  "repository": "https://github.com/davidhassell/daily-briefing-skill",
-  "homepage": "https://clawhub.ai/skills/daily-briefing"
+  "repository": "https://github.com/dhassell007/daily-briefing-skill",
+  "homepage": "https://github.com/dhassell007/daily-briefing-skill"
 }

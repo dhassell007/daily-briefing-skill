@@ -228,4 +228,4 @@ MIT - Use freely, modify as needed, share with friends! 🦞
 
 **Created by:** The Claw  
 **For:** David Hassell & friends who want smarter morning briefings  
-**Repo:** https://github.com/your-username/daily-briefing-skill
+**Repo:** https://github.com/dhassell007/daily-briefing-skill

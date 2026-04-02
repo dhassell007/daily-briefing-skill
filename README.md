@@ -173,5 +173,5 @@ MIT - Use freely, modify as needed, share with friends!
 
 **Created by:** The Claw 🦞  
 **For:** Anyone who wants smarter briefings without the noise  
-**Repo:** https://github.com/your-username/daily-briefing-skill  
-**Skill Directory:** Compatible with ClawHub - install with `clawhub install daily-briefing`
+**Repo:** https://github.com/dhassell007/daily-briefing-skill  
+**Skill Directory:** Compatible with ClawHub and OpenClaw
