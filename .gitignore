@@ -1,0 +1,15 @@
+# Environment files with API keys
+.env
+
+# Skill packages
+*.skill
+
+# Generated data
+last-briefing.json
+
+# System files
+.DS_Store
+*.log
+
+# User configuration (keep config.example.yaml but ignore personalized config.yaml)
+config.yaml

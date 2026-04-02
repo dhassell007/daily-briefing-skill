@@ -1,0 +1,45 @@
+# Daily Briefing Configuration
+# Copy this file to config.yaml and customize for your needs
+
+markets:
+  # Precious metals spot prices (always included, scraped from JM Bullion)
+  metals:
+    - gold
+    - silver
+  
+  # ETFs to track (requires Alpha Vantage API key)
+  etfs:
+    - SPY    # S&P 500
+    - QQQ    # Nasdaq-100
+    - DIA    # Dow Jones
+  
+  # Treasury yields to track
+  bonds:
+    - 2Y     # 2-Year Treasury
+    - 10Y    # 10-Year Treasury
+    - 30Y    # 30-Year Treasury
+    # - 5Y   # Uncomment to add 5-Year Treasury
+
+news:
+  # News sources to include
+  sources:
+    - NYT       # New York Times
+    - WSJ       # Wall Street Journal
+    - BBC       # BBC News
+    - NPR       # NPR
+    - CNBC      # CNBC
+    - Reuters   # Reuters
+    - Guardian  # The Guardian
+    - NBC       # NBC News
+  
+  # Maximum headlines per source
+  max_headlines: 5
+
+# Alpha Vantage API configuration
+# Get your free key at: https://www.alphavantage.co/support/#api-key
+api:
+  alpha_vantage:
+    # Set via environment variable: ALPHA_VANTAGE_API_KEY
+    # Or uncomment and add your key here (NOT recommended for sharing)
+    # key: "YOUR_API_KEY_HERE"
+    rate_limit_delay: 12  # seconds between API calls (free tier: 5 calls/min)

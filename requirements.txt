@@ -1,0 +1,4 @@
+# Daily Briefing Skill Dependencies
+
+requests>=2.31.0    # HTTP requests for APIs and RSS feeds
+pyyaml>=6.0.1       # YAML configuration parsing

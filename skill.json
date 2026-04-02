@@ -1,0 +1,39 @@
+{
+  "name": "daily-briefing",
+  "version": "1.0.0",
+  "description": "Automated daily market briefings with precious metals, ETFs, bonds, and curated news headlines",
+  "author": "The Claw",
+  "license": "MIT",
+  "tags": [
+    "finance",
+    "markets",
+    "news",
+    "automation",
+    "briefing",
+    "precious-metals",
+    "etf",
+    "headlines"
+  ],
+  "dependencies": {
+    "python": ">=3.7",
+    "packages": [
+      "requests>=2.31.0",
+      "pyyaml>=6.0.1"
+    ]
+  },
+  "config": {
+    "files": [
+      "config.yaml",
+      ".env"
+    ],
+    "examples": [
+      "config.example.yaml",
+      ".env.example"
+    ]
+  },
+  "scripts": {
+    "main": "scripts/fetch-briefing.py"
+  },
+  "repository": "https://github.com/davidhassell/daily-briefing-skill",
+  "homepage": "https://clawhub.ai/skills/daily-briefing"
+}
