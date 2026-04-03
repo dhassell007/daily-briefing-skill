@@ -101,35 +101,79 @@ def generate_summary(sections):
             if not title.startswith('⚠️'):
                 top_headlines.append((title, summary, source))
     
-    # Evergreen + dynamic theme detection
-    # Check for broad categories first, then specific current events
-    keywords = {
-        # Evergreen topics (always relevant)
-        'war|conflict|military|strikes|attack': '⚔️ Conflict',
-        'job|employment|unemployment|hiring': '💼 Jobs',
-        'economy|economic|gdp|recession|growth': '📈 Economy',
-        'election|vote|campaign|poll': '🗳️ Elections',
-        'climate|weather|storm|flood|wildfire': '🌍 Climate',
-        'court|judge|supreme|ruling|lawsuit': '⚖️ Courts',
-        'congress|senate|house|legislation': '🏛️ Congress',
-        'fed|federal reserve|interest rate|inflation': '💵 Fed/Rates',
-        'ai|artificial intelligence|tech': '🤖 Tech',
-        'health|hospital|disease|covid|medical': '🏥 Health',
-        'space|nasa|moon|mars|rocket': '🚀 Space',
-        'stocks|market|dow|nasdaq|s&p': '📊 Markets',
+    # Dynamic topic extraction with context-aware emojis
+    # First, extract specific named topics from headlines
+    all_text = ' '.join([h[0] for h in top_headlines])
+    all_text_lower = all_text.lower()
+    
+    found_themes = []
+    
+    # Country/region-specific conflicts (with flags)
+    country_patterns = {
+        'iran': '🇮🇷 Iran',
+        'china': '🇨🇳 China',
+        'russia': '🇷🇺 Russia',
+        'ukraine': '🇺🇦 Ukraine',
+        'israel': '🇮🇱 Israel',
+        'gaza|palestine': '🇵🇸 Gaza',
+        'north korea': '🇰🇵 North Korea',
     }
     
-    # Build emoji theme line (dynamic matching)
-    found_themes = []
-    all_text = ' '.join([h[0] for h in top_headlines]).lower()
-    
-    for pattern, label in keywords.items():
-        if re.search(pattern, all_text):
-            # Avoid duplicates (e.g., "Conflict" and "War")
-            if label not in found_themes:
+    for pattern, label in country_patterns.items():
+        if re.search(pattern, all_text_lower):
+            # Add context: war, conflict, or crisis
+            if re.search(r'\b(war|conflict|strike|attack|military)\b', all_text_lower):
+                found_themes.append(label + ' conflict')
+            else:
                 found_themes.append(label)
     
-    emoji_line = '**Top stories:** ' + ' • '.join(found_themes[:5]) if found_themes else ''
+    # Specific missions/programs (extract actual names)
+    mission_match = re.search(r'artemis\s*(ii|2|iii|3)?', all_text_lower)
+    if mission_match:
+        mission_name = 'Artemis ' + (mission_match.group(1).upper() if mission_match.group(1) else 'II')
+        found_themes.append(f'🚀 {mission_name} mission')
+    
+    # Political figures (extract names + context)
+    if re.search(r'attorney general|bondi|garland', all_text_lower):
+        # Extract the actual name mentioned
+        if 'bondi' in all_text_lower:
+            found_themes.append('⚖️ Bondi AG update')
+        elif 'garland' in all_text_lower:
+            found_themes.append('⚖️ Garland AG update')
+        else:
+            found_themes.append('⚖️ Attorney General')
+    
+    # Jobs report (specific when monthly report)
+    if re.search(r'jobs? report|employment report|\d{2,3},?\d{3} jobs', all_text_lower):
+        found_themes.append('💼 Jobs report')
+    elif re.search(r'\b(job|employment|unemployment|hiring)\b', all_text_lower):
+        found_themes.append('💼 Jobs')
+    
+    # Evergreen categories (broader)
+    evergreen = {
+        'economy|economic|gdp|recession|growth': '📈 Economy',
+        'election|vote|campaign|poll': '🗳️ Elections',
+        'climate|weather|storm|flood|wildfire|hurricane': '🌍 Climate',
+        'supreme court|court ruling|lawsuit': '⚖️ Courts',
+        'congress|senate|house|legislation|bill': '🏛️ Congress',
+        'fed|federal reserve|interest rate|inflation': '💵 Fed policy',
+        'ai|artificial intelligence|chatgpt|openai': '🤖 AI',
+        'health|hospital|disease|pandemic|outbreak': '🏥 Health',
+        'stocks|market|dow|nasdaq|s&p|wall street': '📊 Markets',
+        'crypto|bitcoin|ethereum|blockchain': '₿ Crypto',
+    }
+    
+    for pattern, label in evergreen.items():
+        if re.search(pattern, all_text_lower) and label not in found_themes:
+            # Avoid duplicate labels
+            found_themes.append(label)
+    
+    # Generic conflict if we detected war/military but no specific country
+    if not any('conflict' in t or '🇮🇷' in t or '🇺🇦' in t for t in found_themes):
+        if re.search(r'\b(war|conflict|military|strikes|attack|combat)\b', all_text_lower):
+            found_themes.append('⚔️ Conflict')
+    
+    emoji_line = '**Top stories:** ' + ' • '.join(found_themes[:6]) if found_themes else ''
     
     # Build narrative paragraph (2-3 sentences from top headlines)
     narrative_parts = []
