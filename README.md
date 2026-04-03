@@ -4,39 +4,45 @@
 
 Perfect for morning/afternoon market updates delivered to Telegram, email, or anywhere you need awareness without doomscrolling.
 
+**Two-script approach:** Markets first (90 seconds), then headlines (30 seconds) - clean separation for better reliability.
+
 ## What's Included
 
 ✅ **Precious Metals** - Gold & Silver spot prices + ratio (scraped from JM Bullion, no API needed)  
-✅ **ETF Quotes** - Track your portfolio (VOO, QQQ, SPY, etc.) via Alpha Vantage  
-✅ **Treasury Yields** - 2Y, 10Y, 30Y bonds (placeholder for now)  
-✅ **News Headlines** - NYT, WSJ, BBC, NPR, CNBC, Reuters, Guardian, NBC (via RSS)  
-✅ **Customizable** - Choose which ETFs, sources, and headline counts  
+✅ **ETF Quotes** - Track your portfolio (VOO, QQQM, etc.) via Alpha Vantage  
+✅ **Treasury Yields** - 2Y, 5Y, 10Y, 30Y bonds via Alpha Vantage  
+✅ **Commodities** - WTI & Brent crude oil prices  
+✅ **News Headlines** - NYT, CNN, ABC, NBC, BBC, CNBC, Bloomberg, Fox News, Guardian, Axios, The Hill, NPR  
+✅ **Top Stories Summary** - Auto-generated themes from headline analysis  
+✅ **Bold Headlines** - Easy scanning  
 ✅ **Schedulable** - Run via OpenClaw cron or system cron for automated delivery
 
 ## Quick Start
 
 ```bash
-# 1. Clone or install via ClawHub
-clawhub install daily-briefing
+# 1. Clone the repo
+git clone https://github.com/dhassell007/daily-briefing-skill.git
+cd daily-briefing-skill
 
-# 2. Navigate to skill directory
-cd ~/.openclaw/workspace/daily-briefing
-
-# 3. Install dependencies
+# 2. Install dependencies
 pip3 install -r requirements.txt
 
-# 4. Configure
-cp config.example.yaml config.yaml
-cp .env.example .env
+# 3. Configure your Alpha Vantage API key
+export ALPHA_VANTAGE_API_KEY=your_key_here
+# Or add to ~/.bashrc or ~/.zshrc
 
-# Edit config.yaml to choose your ETFs and news sources
-# Edit .env to add your Alpha Vantage API key (free at https://www.alphavantage.co)
+# Get free API key: https://www.alphavantage.co/support/#api-key
 
-# 5. Test run
-./scripts/fetch-briefing.py
+# 4. Test run
+python3 scripts/market_briefing.py    # Markets (~90 seconds)
+python3 scripts/headlines_briefing.py  # Headlines (~30 seconds)
 
-# 6. Schedule it (via OpenClaw)
-/cron add "0 9 * * *" "Morning briefing" --channel telegram --script ~/.openclaw/workspace/daily-briefing/scripts/fetch-briefing.py
+# 5. Schedule it (via OpenClaw cron)
+/cron add "0 9 * * *" "Morning Markets" --channel telegram \
+  --script ~/.openclaw/workspace/daily-briefing/scripts/market_briefing.py
+
+/cron add "1 9 * * *" "Morning Headlines" --channel telegram \
+  --script ~/.openclaw/workspace/daily-briefing/scripts/headlines_briefing.py
 ```
 
 ## Example Output
