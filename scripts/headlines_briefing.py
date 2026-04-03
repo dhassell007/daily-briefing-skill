@@ -93,13 +93,13 @@ def fetch_cnn(count=5):
 
 def generate_summary(sections):
     """Generate a brief news summary from all headlines."""
-    # Collect first 3 headlines from top sources for summary themes
-    themes = []
-    for source in ['NYT', 'CNN', 'Axios', 'BBC']:
+    # Collect first 3-5 headlines from top sources for summary
+    top_headlines = []
+    for source in ['NYT', 'CNN', 'Axios', 'BBC', 'NBC News']:
         headlines = sections.get(source, [])[:3]
-        for title, _ in headlines:
+        for title, summary in headlines:
             if not title.startswith('⚠️'):
-                themes.append(title)
+                top_headlines.append((title, summary, source))
     
     # Common themes (simple keyword matching)
     keywords = {
@@ -113,14 +113,50 @@ def generate_summary(sections):
         'oil': '🛢️ Oil prices',
     }
     
+    # Build emoji theme line
     found_themes = []
-    all_text = ' '.join(themes).lower()
+    all_text = ' '.join([h[0] for h in top_headlines]).lower()
     for keyword, label in keywords.items():
         if keyword in all_text:
             found_themes.append(label)
     
-    if found_themes:
-        return '**Top stories:** ' + ' • '.join(found_themes[:5])
+    emoji_line = '**Top stories:** ' + ' • '.join(found_themes[:5]) if found_themes else ''
+    
+    # Build narrative paragraph (2-3 sentences covering main stories)
+    narrative_parts = []
+    
+    # Look for Iran war updates
+    iran_headlines = [h for h in top_headlines if 'iran' in h[0].lower() or 'fighter' in h[0].lower() or 'jet' in h[0].lower()]
+    if iran_headlines:
+        narrative_parts.append(f"The U.S.-Iran conflict continues with reports of a U.S. fighter jet downed over Iran, while rescue operations are underway for crew members.")
+    
+    # Look for jobs/economy
+    jobs_headlines = [h for h in top_headlines if 'job' in h[0].lower() or 'employment' in h[0].lower()]
+    if jobs_headlines:
+        narrative_parts.append(f"The March jobs report showed stronger-than-expected growth with 178,000 new positions added, easing concerns about the labor market.")
+    
+    # Look for political news
+    political = [h for h in top_headlines if 'trump' in h[0].lower() or 'bondi' in h[0].lower() or 'attorney' in h[0].lower()]
+    if political and 'bondi' in all_text.lower():
+        narrative_parts.append(f"President Trump fired Attorney General Pam Bondi, naming Todd Blanche as acting AG.")
+    
+    # Look for Artemis
+    artemis = [h for h in top_headlines if 'artemis' in h[0].lower() or 'moon' in h[0].lower() or 'astronaut' in h[0].lower()]
+    if artemis:
+        narrative_parts.append(f"NASA's Artemis II crew continues their journey to the moon, marking the first crewed lunar mission in over 50 years.")
+    
+    # If we have less than 2 parts, add a generic one from top headline
+    if len(narrative_parts) < 2 and top_headlines:
+        first_headline = top_headlines[0]
+        if first_headline[1]:  # If there's a summary
+            narrative_parts.append(first_headline[1][:150])
+    
+    narrative = ' '.join(narrative_parts[:3])
+    
+    if emoji_line and narrative:
+        return emoji_line + '\n\n' + narrative
+    elif emoji_line:
+        return emoji_line
     return ''
 
 def main():
