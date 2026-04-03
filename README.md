@@ -38,11 +38,41 @@ python3 scripts/market_briefing.py    # Markets (~90 seconds)
 python3 scripts/headlines_briefing.py  # Headlines (~30 seconds)
 
 # 5. Schedule it (via OpenClaw cron)
-/cron add "0 9 * * *" "Morning Markets" --channel telegram \
-  --script ~/.openclaw/workspace/daily-briefing/scripts/market_briefing.py
 
-/cron add "1 9 * * *" "Morning Headlines" --channel telegram \
-  --script ~/.openclaw/workspace/daily-briefing/scripts/headlines_briefing.py
+## Important: Proper cron setup for reliable delivery
+
+The headlines script outputs `---SPLIT---` markers to indicate message boundaries. Your cron job must split on these markers and send each section separately.
+
+**Example cron setup:**
+
+```bash
+openclaw cron add \
+  --name "Morning Briefing (9 AM ET)" \
+  --cron "0 9 * * *" \
+  --tz America/New_York \
+  --channel telegram \
+  --system-event "Execute these steps in order:
+
+STEP 1 - Market Briefing:
+Run: python3 /path/to/daily-briefing/scripts/market_briefing.py
+Action: Send the ENTIRE output as ONE message to Telegram.
+
+STEP 2 - Headlines Briefing:
+Run: python3 /path/to/daily-briefing/scripts/headlines_briefing.py
+Action: 
+  - Capture the FULL output
+  - Split the output on '---SPLIT---' delimiters (these mark message boundaries)
+  - Send EACH section as a SEPARATE message to Telegram
+  - There will be 3-4 sections total
+
+CRITICAL: Do NOT add any commentary, explanations, or meta-text. Just forward the raw script output."
+```
+
+**Why this matters:**
+- Headlines output is too long for a single Telegram message (4096 char limit)
+- The script automatically splits at safe boundaries
+- Your cron must respect the splits to avoid truncation
+- Without proper splitting, you'll get incomplete briefings
 ```
 
 ## Example Output

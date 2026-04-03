@@ -139,14 +139,41 @@ Updated: 2026-04-02 09:00 AM MST
 
 ### Schedule via OpenClaw Cron
 
-Create scheduled briefings delivered to Telegram, email, or any OpenClaw-connected channel:
+**IMPORTANT:** The headlines script outputs `---SPLIT---` markers to separate message chunks. Your cron job MUST split on these markers and send each section separately to avoid truncation.
+
+**Recommended cron setup:**
 
 ```bash
-# Morning briefing (9 AM ET)
-/cron add "0 9 * * *" "Run daily morning briefing" --channel telegram --timezone America/New_York --script ~/.openclaw/workspace/daily-briefing/scripts/fetch-briefing.py
+openclaw cron add \
+  --name "Morning Briefing" \
+  --cron "0 9 * * *" \
+  --tz America/New_York \
+  --channel telegram \
+  --system-event "Execute these steps in order:
 
-# Afternoon briefing (3:30 PM ET, market close)
-/cron add "30 15 * * 1-5" "Run daily afternoon briefing" --channel telegram --timezone America/New_York --script ~/.openclaw/workspace/daily-briefing/scripts/fetch-briefing.py
+STEP 1 - Market Briefing:
+Run: python3 ~/.openclaw/workspace/daily-briefing/scripts/market_briefing.py
+Action: Send the ENTIRE output as ONE message.
+
+STEP 2 - Headlines Briefing:
+Run: python3 ~/.openclaw/workspace/daily-briefing/scripts/headlines_briefing.py
+Action: 
+  - Capture the FULL output
+  - Split the output on '---SPLIT---' delimiters (these mark message boundaries)
+  - Send EACH section as a SEPARATE message
+  - There will be 3-4 sections total
+
+CRITICAL: Do NOT add any commentary, explanations, or meta-text. Just forward the raw script output."
+```
+
+**For afternoon briefing (3:30 PM ET):**
+```bash
+openclaw cron add \
+  --name "Afternoon Briefing" \
+  --cron "30 15 * * *" \
+  --tz America/New_York \
+  --channel telegram \
+  --system-event "[same as above]"
 ```
 
 ### Direct Cron (Unix/Linux/Mac)
