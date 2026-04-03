@@ -101,55 +101,53 @@ def generate_summary(sections):
             if not title.startswith('⚠️'):
                 top_headlines.append((title, summary, source))
     
-    # Common themes (simple keyword matching)
+    # Evergreen + dynamic theme detection
+    # Check for broad categories first, then specific current events
     keywords = {
-        'iran': '🇮🇷 Iran war',
-        'trump': '🏛️ Trump administration',
-        'jobs': '💼 Jobs report',
-        'economy': '📈 Economy',
-        'bondi': '⚖️ Attorney General',
-        'artemis': '🚀 Artemis II mission',
-        'nato': '🛡️ NATO tensions',
-        'oil': '🛢️ Oil prices',
+        # Evergreen topics (always relevant)
+        'war|conflict|military|strikes|attack': '⚔️ Conflict',
+        'job|employment|unemployment|hiring': '💼 Jobs',
+        'economy|economic|gdp|recession|growth': '📈 Economy',
+        'election|vote|campaign|poll': '🗳️ Elections',
+        'climate|weather|storm|flood|wildfire': '🌍 Climate',
+        'court|judge|supreme|ruling|lawsuit': '⚖️ Courts',
+        'congress|senate|house|legislation': '🏛️ Congress',
+        'fed|federal reserve|interest rate|inflation': '💵 Fed/Rates',
+        'ai|artificial intelligence|tech': '🤖 Tech',
+        'health|hospital|disease|covid|medical': '🏥 Health',
+        'space|nasa|moon|mars|rocket': '🚀 Space',
+        'stocks|market|dow|nasdaq|s&p': '📊 Markets',
     }
     
-    # Build emoji theme line
+    # Build emoji theme line (dynamic matching)
     found_themes = []
     all_text = ' '.join([h[0] for h in top_headlines]).lower()
-    for keyword, label in keywords.items():
-        if keyword in all_text:
-            found_themes.append(label)
+    
+    for pattern, label in keywords.items():
+        if re.search(pattern, all_text):
+            # Avoid duplicates (e.g., "Conflict" and "War")
+            if label not in found_themes:
+                found_themes.append(label)
     
     emoji_line = '**Top stories:** ' + ' • '.join(found_themes[:5]) if found_themes else ''
     
-    # Build narrative paragraph (2-3 sentences covering main stories)
+    # Build narrative paragraph (2-3 sentences from top headlines)
     narrative_parts = []
     
-    # Look for Iran war updates
-    iran_headlines = [h for h in top_headlines if 'iran' in h[0].lower() or 'fighter' in h[0].lower() or 'jet' in h[0].lower()]
-    if iran_headlines:
-        narrative_parts.append(f"The U.S.-Iran conflict continues with reports of a U.S. fighter jet downed over Iran, while rescue operations are underway for crew members.")
+    # Use the first 3 headlines with summaries to build narrative
+    for headline, summary, source in top_headlines[:3]:
+        if summary:
+            # Use the summary as-is (it's already concise and relevant)
+            narrative_parts.append(summary)
+            if len(narrative_parts) >= 3:
+                break
     
-    # Look for jobs/economy
-    jobs_headlines = [h for h in top_headlines if 'job' in h[0].lower() or 'employment' in h[0].lower()]
-    if jobs_headlines:
-        narrative_parts.append(f"The March jobs report showed stronger-than-expected growth with 178,000 new positions added, easing concerns about the labor market.")
-    
-    # Look for political news
-    political = [h for h in top_headlines if 'trump' in h[0].lower() or 'bondi' in h[0].lower() or 'attorney' in h[0].lower()]
-    if political and 'bondi' in all_text.lower():
-        narrative_parts.append(f"President Trump fired Attorney General Pam Bondi, naming Todd Blanche as acting AG.")
-    
-    # Look for Artemis
-    artemis = [h for h in top_headlines if 'artemis' in h[0].lower() or 'moon' in h[0].lower() or 'astronaut' in h[0].lower()]
-    if artemis:
-        narrative_parts.append(f"NASA's Artemis II crew continues their journey to the moon, marking the first crewed lunar mission in over 50 years.")
-    
-    # If we have less than 2 parts, add a generic one from top headline
-    if len(narrative_parts) < 2 and top_headlines:
-        first_headline = top_headlines[0]
-        if first_headline[1]:  # If there's a summary
-            narrative_parts.append(first_headline[1][:150])
+    # If we don't have enough summaries, use headlines themselves
+    if len(narrative_parts) < 2:
+        for headline, summary, source in top_headlines[:3]:
+            if not summary and len(narrative_parts) < 3:
+                # Create a simple sentence from the headline
+                narrative_parts.append(headline + '.')
     
     narrative = ' '.join(narrative_parts[:3])
     
