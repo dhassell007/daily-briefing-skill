@@ -153,14 +153,14 @@ openclaw cron add \
 
 STEP 1 - Market Briefing:
 Run: python3 ~/.openclaw/workspace/daily-briefing/scripts/market_briefing.py
-Action: Send the ENTIRE output as ONE message.
+Action: Send the ENTIRE output as ONE message to the configured channel.
 
 STEP 2 - Headlines Briefing:
 Run: python3 ~/.openclaw/workspace/daily-briefing/scripts/headlines_briefing.py
 Action: 
   - Capture the FULL output
   - Split the output on '---SPLIT---' delimiters (these mark message boundaries)
-  - Send EACH section as a SEPARATE message
+  - Send EACH section as a SEPARATE message to the configured channel
   - There will be 3-4 sections total
 
 CRITICAL: Do NOT add any commentary, explanations, or meta-text. Just forward the raw script output."
