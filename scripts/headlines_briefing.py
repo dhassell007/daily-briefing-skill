@@ -172,7 +172,30 @@ def main():
                 lines.append(f'  _{summary}_')
         lines.append('')
     
-    print('\n'.join(lines))
+    # Split into messages under 4096 chars for Telegram
+    full_output = '\n'.join(lines)
+    messages = []
+    current_message = []
+    current_length = 0
+    
+    for line in lines:
+        line_length = len(line) + 1  # +1 for newline
+        if current_length + line_length > 4000:  # Leave margin for safety
+            messages.append('\n'.join(current_message))
+            current_message = [line]
+            current_length = line_length
+        else:
+            current_message.append(line)
+            current_length += line_length
+    
+    if current_message:
+        messages.append('\n'.join(current_message))
+    
+    # Print each message separated by a delimiter
+    for i, msg in enumerate(messages):
+        print(msg)
+        if i < len(messages) - 1:
+            print('\n---SPLIT---\n')  # Delimiter for splitting
 
 if __name__ == '__main__':
     main()
